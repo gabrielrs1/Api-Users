@@ -1,8 +1,27 @@
 var User = require("../models/User")
 
 class UserController {
-    async index(req, res) {}
+    // All users
+    async index(req, res) {
+        var users = await User.FindAll()
+        res.json(users)
+    }
 
+    // Find user
+    async findUser(req, res) {
+        var id = req.params.id
+        var user = await User.findById(id)
+
+        if(user == undefined) {
+            res.status(404)
+            res.json({})
+        } else {
+            res.status(200)
+            res.json(user)
+        }
+    }
+
+    // Create users
     async create(req, res) {
         var { name, email, password } = req.body
         
@@ -34,6 +53,21 @@ class UserController {
         await User.new(name, email, password)
 
         res.sendStatus(200)
+    }
+
+    async edit(req, res) {
+        var { id, name, email, role} = req.body
+
+        var result = await User.update(id, name, email, role)
+        if(result != undefined) {
+            if(result.status) {
+                res.sendStatus(200)
+            } else {
+                res.sendStatus(406)
+            }
+        } else {
+            res.json({err: "erro na edicao"})
+        }
     }
 }
 
